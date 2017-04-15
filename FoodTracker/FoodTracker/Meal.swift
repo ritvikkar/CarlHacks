@@ -15,7 +15,7 @@ class Meal: NSObject, NSCoding {
     
     var name: String
     var photo: UIImage?
-    var rating: Int
+    var ingredients: String
     
     //MARK: Archiving Paths
     
@@ -27,34 +27,34 @@ class Meal: NSObject, NSCoding {
     struct PropertyKey {
         static let name = "name"
         static let photo = "photo"
-        static let rating = "rating"
+        static let ingredients = "ingredients"
     }
     
     //MARK: Initialization
     
-    init?(name: String, photo: UIImage?, rating: Int) {
+    init?(name: String, photo: UIImage?, ingredients: String) {
         
         // The name must not be empty
         guard !name.isEmpty else {
             return nil
         }
 
-        // The rating must be between 0 and 5 inclusively
-        guard (rating >= 0) && (rating <= 5) else {
+        // The ingredents must not be empty
+        guard !ingredients.isEmpty else {
             return nil
         }
         
         // Initialize stored properties.
         self.name = name
         self.photo = photo
-        self.rating = rating
+        self.ingredients = ingredients
     }
     
     //MARK: NSCoding
     func encode(with aCoder: NSCoder) {
         aCoder.encode(name, forKey: PropertyKey.name)
         aCoder.encode(photo, forKey: PropertyKey.photo)
-        aCoder.encode(rating, forKey: PropertyKey.rating)
+        aCoder.encode(ingredients, forKey: PropertyKey.ingredients)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
@@ -68,10 +68,14 @@ class Meal: NSObject, NSCoding {
         // Because photo is an optional property of Meal, just use conditional cast.
         let photo = aDecoder.decodeObject(forKey: PropertyKey.photo) as? UIImage
         
-        let rating = aDecoder.decodeInteger(forKey: PropertyKey.rating)
+        // The name is required. If we cannot decode a name string, the initializer should fail.
+        guard let ingredients = aDecoder.decodeObject(forKey: PropertyKey.ingredients) as? String else {
+            os_log("Unable to decode the ingredents for a Meal object.", log: OSLog.default, type: .debug)
+            return nil
+        }
         
         // Must call designated initializer.
-        self.init(name: name, photo: photo, rating: rating)
+        self.init(name: name, photo: photo, ingredients: ingredients)
         
     }
 }
