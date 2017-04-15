@@ -61,7 +61,8 @@ class MealTableViewController: UITableViewController {
         
         cell.nameLabel.text = meal.name
         cell.photoImageView.image = meal.photo
-        
+        cell.ingredientsLabel.text = meal.ingredients
+
         return cell
     }
     
